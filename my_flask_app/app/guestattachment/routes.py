@@ -3,7 +3,7 @@ from app.guestattachment.services import get_guestattachment_data
 from flask import Blueprint, jsonify, request
 from app.guest.services import get_guest_data
 from app import db
-from app.models import Payment, Checkin, Guest, GuestAttachment, CheckinGuest, Log, GuestVersion, Room, Country, Emirate, DocumentType, VisitPurpose, Relationship,  PaymentType, CheckinType, CardType, Checkout
+from app.models import Payment, Checkin, Guest, GuestAttachment, CheckinGuest, Log, GuestVersion, Room, Country, Emirate, DocumentType, VisitPurpose, Relationship,  PaymentType, CheckinType, CardType, Checkout, GuestDocumentImage
 from datetime import datetime, timezone
 import uuid
 import base64
@@ -213,8 +213,23 @@ def create_guestattachment():
                 attachment_uid = str(uuid.uuid4())  # Generate a unique UID for the attachment
                 add_attachment = True
 
+                # Save to GuestDocumentImage table
+                new_doc = GuestDocumentImage(
+                    GuestId=guest_id,
+                    DocumentUID=None,  #  keep NULL
+                    AttachmentCode=attachment.get('AttachmentCode') or attachment.get('attachmenttCode') or str(uuid.uuid4()),
+                    FileName=new_name,
+                    FileSizeKB=int(len(image_data) / 1024),
+                    ImageData=image_data,
+                    UploadedAt=local_time_str
+                )
+
+                db.session.add(new_doc)
+                db.session.flush()  #  Get DocumentId immediately
+
+
                 attachments_response.append({
-                    "uid": attachment_uid,
+                    "uid": new_doc.DocumentId,
                     "attachmenttCode": attachment.get('AttachmentCode') or attachment.get('attachmenttCode')  # Default value
                 })
 

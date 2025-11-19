@@ -3,12 +3,12 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
-
+from app.config import Config
 
 
 class Checkin(db.Model):
     __tablename__ = 'checkin'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -21,8 +21,8 @@ class Checkin(db.Model):
     TDFee = db.Column(db.Float, nullable=True)  # float(53)
     AddedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # datetime2
     AddedFrom = db.Column(db.String(45), nullable=False)  # nvarchar(45)
-    CheckinTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkintype.Id'), nullable=False)
-    PaymentId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.payment.Id'), nullable=False)
+    CheckinTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkintype.Id'), nullable=False)
+    PaymentId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.payment.Id'), nullable=False)
     ChildEscortCount = db.Column(db.Integer, nullable=True)  # int
     AdultEscortCount = db.Column(db.Integer, nullable=True)  # int
 
@@ -35,7 +35,7 @@ class Checkin(db.Model):
 
 class Checkout(db.Model):
     __tablename__ = 'checkout'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -43,8 +43,8 @@ class Checkout(db.Model):
     ChargeExtra = db.Column(db.Boolean, nullable=False)  # bit
     AddedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # datetime2
     AddedFrom = db.Column(db.String(45), nullable=False)  # nvarchar(45)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=False)
-    CancellationReasonId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.cancellationreason.Id'), nullable=True)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=False)
+    CancellationReasonId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.cancellationreason.Id'), nullable=True)
     CheckoutTypeId = db.Column(db.Integer, nullable=False)  # int
 
     def __repr__(self):
@@ -53,17 +53,17 @@ class Checkout(db.Model):
 
 class RoomChange(db.Model):
     __tablename__ = 'roomchange'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
     FromRoomNumber = db.Column(db.String(10), nullable=False)  # nvarchar(10)
     ToRoomNumber = db.Column(db.String(10), nullable=False)  # nvarchar(10)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=False)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=False)
     EffectiveDateTime = db.Column(db.DateTime, nullable=False)  # datetime2
     AddedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)  # datetime2
     AddedFrom = db.Column(db.String(45), nullable=False)  # nvarchar(45)
-    LogId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.log.Id'), nullable=False)
+    LogId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.log.Id'), nullable=False)
     
 
 
@@ -73,7 +73,7 @@ class RoomChange(db.Model):
 
 class AccessibilityType(db.Model):
     __tablename__ = 'accessibilitytype'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
 
     # Columns
@@ -88,7 +88,7 @@ class AccessibilityType(db.Model):
 
 class CancellationReason(db.Model):
     __tablename__ = 'cancellationreason'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -101,7 +101,7 @@ class CancellationReason(db.Model):
 
 class CardType(db.Model):
     __tablename__ = 'cardtype'  # Table name
-    __table_args__ = {'schema':db.schema}  # Schema name
+    __table_args__ = {'schema':Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -116,7 +116,7 @@ class CardType(db.Model):
 
 class CheckinGuest(db.Model):
     __tablename__ = 'checkinguest'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -126,11 +126,11 @@ class CheckinGuest(db.Model):
     GuestUID = db.Column(db.String(45), nullable=True)  # nvarchar(45), nullable
     CheckoutDate = db.Column(db.DateTime, nullable=True)  # datetime2, nullable
     IsFirstGuest = db.Column(db.Boolean, nullable=False)  # bit
-    GuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.guest.Id'), nullable=False)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=False)
+    GuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.guest.Id'), nullable=False)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=False)
     RelationshipName = db.Column(db.String(45), nullable=True)  # nvarchar(45), nullable
-    EscortTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.escorttype.Id'), nullable=True)
-    VisitPurposeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.visitpurpose.Id'), nullable=False)
+    EscortTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.escorttype.Id'), nullable=True)
+    VisitPurposeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.visitpurpose.Id'), nullable=False)
     
 
     guest = db.relationship('Guest', backref='checkinguests')
@@ -143,7 +143,7 @@ class CheckinGuest(db.Model):
 
 class CheckinType(db.Model):
     __tablename__ = 'checkintype'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -155,7 +155,7 @@ class CheckinType(db.Model):
 
 class CheckoutType(db.Model):
     __tablename__ = 'checkouttype'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     Type = db.Column(db.String(45), nullable=False)
@@ -164,7 +164,7 @@ class CheckoutType(db.Model):
 
 class Country(db.Model):
     __tablename__ = 'country'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -180,7 +180,7 @@ class Country(db.Model):
     
 class DocumentType(db.Model):
     __tablename__ = 'documenttype'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     Type = db.Column(db.String(45), nullable=False)
@@ -193,7 +193,7 @@ class DocumentType(db.Model):
 
 class Dtcmaction(db.Model):
     __tablename__ = 'dtcmaction'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -205,7 +205,7 @@ class Dtcmaction(db.Model):
     
 class Emirate(db.Model):
     __tablename__ = 'emirate'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Name = db.Column(db.String(45), nullable=False)
@@ -217,7 +217,7 @@ class Emirate(db.Model):
 
 class EscortType(db.Model):
     __tablename__ = 'escorttype'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     Type = db.Column(db.String(45), nullable=False)
@@ -228,7 +228,7 @@ class EscortType(db.Model):
 
 class Guest(db.Model):
     __tablename__ = 'guest'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
@@ -244,8 +244,8 @@ class Guest(db.Model):
     Email = db.Column(db.String(45), nullable=True)  # nvarchar(45), nullable
     RequiresAccessibilityJson = db.Column(db.String(255), nullable=True)  # nvarchar(255), nullable
     DocumentNumber = db.Column(db.String(45), nullable=False)  # nvarchar(45)
-    NationalityId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.country.Id'), nullable=False)
-    EmirateId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.emirate.Id'), nullable=True)
+    NationalityId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.country.Id'), nullable=False)
+    EmirateId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.emirate.Id'), nullable=True)
     BirthPlaceName = db.Column(db.String(255), nullable=False)  # nvarchar(255)
     ResidenceCountryTwoCode = db.Column(db.String(5), nullable=False)  # nvarchar(5)
 
@@ -257,27 +257,42 @@ class Guest(db.Model):
 
 class GuestAttachment(db.Model):
     __tablename__ = 'guestattachment'  # Table name
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     # Columns
     Id = db.Column(db.Integer, primary_key=True)  # Primary key
     ExpiryDate = db.Column(db.DateTime, nullable=False)  # datetime2
     IssueDate = db.Column(db.DateTime, nullable=False)  # datetime2
     AttachmentInfoListJson = db.Column(db.String(1000), nullable=False)  # nvarchar(1000)
-    DocumentTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.documenttype.Id'), nullable=False)
-    IssueCountryId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.country.Id'), nullable=False)
-    GuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.guest.Id'), nullable=False)
+    DocumentTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.documenttype.Id'), nullable=False)
+    IssueCountryId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.country.Id'), nullable=False)
+    GuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.guest.Id'), nullable=False)
 
     # def __repr__(self):
     #     return f"<GuestAttachment Id={self.Id}, GuestId={self.GuestId}, DocumentTypeId={self.DocumentTypeId}>"
+
+class GuestDocumentImage(db.Model):
+    __tablename__ = 'guestdocumentimages'
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # replace with your schema if needed
+
+    DocumentId = db.Column(db.Integer, primary_key=True)
+    GuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.guest.Id'), nullable=False)
+    DocumentUID = db.Column(db.String(255), nullable=True)
+    AttachmentCode = db.Column(db.String(255), nullable=True)
+    FileName = db.Column(db.String(255), nullable=True)
+    FileSizeKB = db.Column(db.Integer, nullable=True)
+    ImageData = db.Column(db.LargeBinary, nullable=True)
+    UploadedAt = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
+
     
+
 
 class GuestVersion(db.Model):
     __tablename__ = 'guestversion'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
-    CheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkinguest.Id'), primary_key=True, nullable=False)
-    LogId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.log.Id'), primary_key=True, nullable=False)
+    CheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkinguest.Id'), primary_key=True, nullable=False)
+    LogId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.log.Id'), primary_key=True, nullable=False)
 
 
 
@@ -292,33 +307,33 @@ class GuestVersion(db.Model):
     MobileNumber = db.Column(db.String(45), nullable=True)
     Email = db.Column(db.String(45), nullable=True)
     RequiresAccessibilityJson = db.Column(db.String(255), nullable=True)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=False)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=False)
     DocumentNumber = db.Column(db.String(45), nullable=False)
-    NationalityId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.country.Id'), nullable=False)
-    EmirateId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.emirate.Id'), nullable=True)
+    NationalityId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.country.Id'), nullable=False)
+    EmirateId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.emirate.Id'), nullable=True)
     CheckinDate = db.Column(db.DateTime, nullable=False)
     CheckoutDate = db.Column(db.DateTime, nullable=True)
     IsMainGuest = db.Column(db.Boolean, nullable=False)
     GuestCode = db.Column(db.String(75), nullable=True)
     GuestUID = db.Column(db.String(45), nullable=True)
-    GuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.guest.Id'), nullable=False)
-    RelationshipId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.relationship.Id'), nullable=True)
-    EscortTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.escorttype.Id'), nullable=True)
-    VisitPurposeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.visitpurpose.Id'), nullable=False)
+    GuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.guest.Id'), nullable=False)
+    RelationshipId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.relationship.Id'), nullable=True)
+    EscortTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.escorttype.Id'), nullable=True)
+    VisitPurposeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.visitpurpose.Id'), nullable=False)
     ExpiryDate = db.Column(db.DateTime, nullable=False)
     IssueDate = db.Column(db.DateTime, nullable=False)
-    DocumentTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.documenttype.Id'), nullable=False)
+    DocumentTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.documenttype.Id'), nullable=False)
     # LogId = db.Column(Integer, ForeignKey('log.Id'), nullable=False)
     # CheckinGuestId = db.Column(Integer, ForeignKey('checkinguest.Id'), nullable=False)
     BirthPlaceName = db.Column(db.String(255), nullable=False)
     ResidenceCountryTwoCode = db.Column(db.String(5), nullable=False)
     IssueCountryTwoCode = db.Column(db.String(5), nullable=False)
     AttachmentInfoListJson = db.Column(db.String(1000), nullable=False)
-    CurrentMainCheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkinguest.Id'), nullable=False)
+    CurrentMainCheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkinguest.Id'), nullable=False)
 
 class Log(db.Model):
     __tablename__ = 'log'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     AddedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
@@ -329,37 +344,37 @@ class Log(db.Model):
     CheckinUID = db.Column(db.String(45), nullable=True)
     PayloadIdentifier = db.Column(db.String(45), nullable=True)
     Error = db.Column(db.String(255), nullable=True)
-    CheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkinguest.Id'), nullable=False)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=False)
+    CheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkinguest.Id'), nullable=False)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=False)
 
 class MainGuestChange(db.Model):
     __tablename__ = 'mainguestchange'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
-    FormerMainCheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkinguest.Id'), nullable=False)
-    NewMainCheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkinguest.Id'), nullable=False)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=False)
+    FormerMainCheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkinguest.Id'), nullable=False)
+    NewMainCheckinGuestId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkinguest.Id'), nullable=False)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=False)
     EffectiveDateTime = db.Column(db.DateTime, nullable=False)
     AddedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     AddedFrom = db.Column(db.String(45), nullable=False)
-    LogId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.log.Id'), nullable=False)
+    LogId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.log.Id'), nullable=False)
 
 class Payment(db.Model):
     __tablename__ = 'payment'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
     
     Id = db.Column(db.Integer, primary_key=True)
     CardNumber = db.Column(db.String(45), nullable=True)
     PaidAmount = db.Column(db.Float, nullable=False)
     AddedAt = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     AddedFrom = db.Column(db.String(45), nullable=False)
-    PaymentTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.paymenttype.Id'), nullable=False)
-    CardTypeId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.cardtype.Id'), nullable=True)
+    PaymentTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.paymenttype.Id'), nullable=False)
+    CardTypeId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.cardtype.Id'), nullable=True)
 
 class PaymentType(db.Model):
     __tablename__ = 'paymenttype'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     Type = db.Column(db.String(45), nullable=False)
@@ -367,7 +382,7 @@ class PaymentType(db.Model):
 
 class Relationship(db.Model):
     __tablename__ = 'relationship'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     Relation = db.Column(db.String(45), nullable=False)
@@ -375,13 +390,13 @@ class Relationship(db.Model):
 
 class Room(db.Model):
     __tablename__ = 'room'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
 
     Id = db.Column(db.Integer, primary_key=True)
     RoomNumber = db.Column(db.String(45), nullable=False)
     BedCount = db.Column(db.Integer, nullable=False)
     IsChecked = db.Column(db.Boolean, nullable=False)
-    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{db.schema}.checkin.Id'), nullable=True)
+    CheckinId = db.Column(db.Integer, db.ForeignKey(f'{Config.SCHEMA_NAME}.checkin.Id'), nullable=True)
     IsWaitingRoom = db.Column(db.Boolean, nullable=False)
     IsActive = db.Column(db.Boolean, nullable=False)
 
@@ -390,7 +405,7 @@ class Room(db.Model):
 
 class VisitPurpose(db.Model):
     __tablename__ = 'visitpurpose'
-    __table_args__ = {'schema': db.schema}  # Schema name
+    __table_args__ = {'schema': Config.SCHEMA_NAME}  # Schema name
     
     Id = db.Column(db.Integer, primary_key=True)
     Purpose = db.Column(db.String(45), nullable=False)

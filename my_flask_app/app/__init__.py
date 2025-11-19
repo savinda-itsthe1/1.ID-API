@@ -14,6 +14,13 @@ def create_app():
     # Initialize extensions with the app
     db.init_app(app)
 
+    
+
+     #  Import all models here so they get registered before any query
+    with app.app_context():
+        from app import models  # <-- Make sure this file imports all model classes
+
+
     # Register blueprints
     from app.checkin.routes import checkin_bp
     from app.checkout.routes import checkout_bp
@@ -31,6 +38,7 @@ def create_app():
     from app.escorttype.routes import escorttype_bp
     from app.guest.routes import guest_bp
     from app.guestattachment.routes import guestattachment_bp
+    from app.guestdocumentimage.routes import guestdocumentimage_bp
     from app.guestversion.routes import guestversion_bp
     from app.log.routes import log_bp
     from app.mainguestchange.routes import mainguestchange_bp
@@ -62,6 +70,7 @@ def create_app():
     app.register_blueprint(escorttype_bp)
     app.register_blueprint(guest_bp)
     app.register_blueprint(guestattachment_bp)
+    app.register_blueprint(guestdocumentimage_bp)
     app.register_blueprint(guestversion_bp)
     app.register_blueprint(log_bp)
     app.register_blueprint(mainguestchange_bp)
@@ -72,5 +81,7 @@ def create_app():
     app.register_blueprint(visitpurpose_bp)
     app.register_blueprint(guestcheckout_bp)
     app.register_blueprint(checkincancellation_bp)
+
+    print("Database URI:", app.config["SQLALCHEMY_DATABASE_URI"])
 
     return app

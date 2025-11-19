@@ -3,4 +3,8 @@ from app import create_app
 app = create_app()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Set host to '0.0.0.0' to make it accessible externally
+    app.run(debug=True, host='0.0.0.0', port=5030)
+
+
+    

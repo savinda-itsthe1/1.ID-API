@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from app.guest.services import get_guest_data
 from app import db
-from app.models import Payment, Checkin, Guest, GuestAttachment, CheckinGuest, Log, GuestVersion, Room, Country, Emirate, DocumentType, VisitPurpose, Relationship,  PaymentType, CheckinType, CardType, Checkout
+from app.models import Payment, Checkin, Guest, GuestAttachment, CheckinGuest, Log, GuestVersion, Room, Country, Emirate, DocumentType, VisitPurpose, Relationship,  PaymentType, CheckinType, CardType, Checkout, GuestDocumentImage
 from datetime import datetime, timezone
 import uuid
 import base64
@@ -669,11 +669,67 @@ def create_guestcheckin():
                 # Save the image using ImageManipulator
                 guest_id = guest.Id  # Use the guest ID from the database
                 attachment_info_list,duplicate_image_status = ImageManipulator.save_bitmap_image_list([image],image_name ,guest_id,duplicate_image_status)
-                attachment_uid = str(uuid.uuid4())  # Generate a unique UID for the attachment
-                attachments_response.append({
-                    "uid": attachment_uid,
-                    "attachmenttCode": attachment.get('AttachmentCode')  or attachment.get('attachmenttCode') # Default value
-                })
+
+                # #  Save same image as blob in database
+                # file_size_kb = int(len(image_data) / 1024)
+                # new_blob = GuestDocumentImage(
+                #     GuestId=guest_id,
+                #     DocumentUID=None,
+                #     AttachmentCode=attachment.get('AttachmentCode') or attachment.get('attachmenttCode'),
+                #     FileName=image_name,
+                #     FileSizeKB=file_size_kb,
+                #     ImageData=image_data,  # blob bytes
+                #     UploadedAt=datetime.now() 
+
+                        
+                        
+                # )
+                # db.session.add(new_blob)
+                # db.session.flush()  #  Get the auto-generated DocumentId before commit
+
+                # attachment_uid = str(uuid.uuid4())  # Generate a unique UID for the attachment
+                # attachments_response.append({
+                #     "uid": new_blob.GuestId,
+                #     "attachmenttCode": attachment.get('AttachmentCode')  or attachment.get('attachmenttCode') # Default value
+                # })
+
+                # Compute hash for the incoming image
+                image_hash = ImageManipulator.calculate_image_hash(image_data)
+
+                # Check if the same hash already exists in the database
+                existing_blob = db.session.query(GuestDocumentImage).filter_by(GuestId=guest_id).all()
+
+                # Compare hashes with images already in the database
+                is_duplicate_in_db = False
+                for blob in existing_blob:
+                    existing_hash = ImageManipulator.calculate_image_hash(blob.ImageData)
+                    if image_hash == existing_hash:
+                        is_duplicate_in_db = True
+                        print(f"Duplicate image detected in database for GuestId={guest_id}, skipping save.")
+                        break
+
+                # Only add to DB if not duplicate
+                if not is_duplicate_in_db:
+                    file_size_kb = int(len(image_data) / 1024)
+                    new_blob = GuestDocumentImage(
+                        GuestId=guest_id,
+                        DocumentUID=None,
+                        AttachmentCode=attachment.get('AttachmentCode') or attachment.get('attachmenttCode'),
+                        FileName=image_name,
+                        FileSizeKB=file_size_kb,
+                        ImageData=image_data,
+                        UploadedAt=datetime.now()
+                    )
+
+                    db.session.add(new_blob)
+                    db.session.flush()
+
+                    attachments_response.append({
+                        "uid": new_blob.DocumentId,
+                        "attachmenttCode": attachment.get('AttachmentCode') or attachment.get('attachmenttCode')
+                    })
+                else:
+                    duplicate_image_status = True
         
 
         # Process attachments
@@ -1491,11 +1547,45 @@ def update_guestcheckin():
                 duplicate_image_status = False
                 print("guest_id",guest_id)
                 attachment_info_list,duplicate_image_status = ImageManipulator.save_bitmap_image_list([image], image_name, guest_id, duplicate_image_status)
-                attachment_uid = str(uuid.uuid4())  # Generate a unique UID for the attachment
-                attachments_response.append({
-                    "uid": attachment_uid,
-                    "attachmenttCode": attachment.get('AttachmentCode')  or attachment.get('attachmenttCode') # Default value
-                })
+
+
+                # Compute hash for the incoming image
+                image_hash = ImageManipulator.calculate_image_hash(image_data)
+
+                # Check if the same hash already exists in the database
+                existing_blob = db.session.query(GuestDocumentImage).filter_by(GuestId=guest_id).all()
+
+                # Compare hashes with images already in the database
+                is_duplicate_in_db = False
+                for blob in existing_blob:
+                    existing_hash = ImageManipulator.calculate_image_hash(blob.ImageData)
+                    if image_hash == existing_hash:
+                        is_duplicate_in_db = True
+                        print(f"Duplicate image detected in database for GuestId={guest_id}, skipping save.")
+                        break
+
+                # Only add to DB if not duplicate
+                if not is_duplicate_in_db:
+                    file_size_kb = int(len(image_data) / 1024)
+                    new_blob = GuestDocumentImage(
+                        GuestId=guest_id,
+                        DocumentUID=None,
+                        AttachmentCode=attachment.get('AttachmentCode') or attachment.get('attachmenttCode'),
+                        FileName=image_name,
+                        FileSizeKB=file_size_kb,
+                        ImageData=image_data,
+                        UploadedAt=datetime.now()
+                    )
+
+                    db.session.add(new_blob)
+                    db.session.flush()
+
+                    attachments_response.append({
+                        "uid": new_blob.DocumentId,
+                        "attachmenttCode": attachment.get('AttachmentCode') or attachment.get('attachmenttCode')
+                    })
+                else:
+                    duplicate_image_status = True
         
 
         # Process attachments
